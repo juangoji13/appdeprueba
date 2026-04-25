@@ -25,7 +25,12 @@ jobs:
         run: npm install
 
       - name: Expo Prebuild
-        run: npx expo prebuild --platform ios
+        run: npx expo prebuild --platform ios --clean
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
 
       - name: Build iOS App without Signing
         run: |
