@@ -29,39 +29,21 @@ jobs:
 
       - name: Build iOS App without Signing
         run: |
-          cd ios
-          # The workspace name usually matches the app name from app.json
-          xcodebuild \
-            -workspace MiAppPrueba.xcworkspace \
+          xcodebuild archive \
+            -workspace ios/MiAppPrueba.xcworkspace \
             -scheme MiAppPrueba \
             -configuration Release \
             -sdk iphoneos \
-            -derivedDataPath Build/ \
+            -archivePath build/MiAppPrueba.xcarchive \
+            CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            build
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Package .app to .ipa
         run: |
-          # Find the .app file generated
-          APP_PATH=$(find ios/Build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
-          
-          if [ -z "$APP_PATH" ]; then
-            echo "Error: .app file not found"
-            exit 1
-          fi
-          
-          echo "Found app at: $APP_PATH"
-          
-          # Create Payload directory
           mkdir -p Payload
-          
-          # Copy .app to Payload
-          cp -r "$APP_PATH" Payload/
-          
-          # Zip Payload to .ipa
+          cp -r build/MiAppPrueba.xcarchive/Products/Applications/*.app Payload/
           zip -r miappprueba.ipa Payload
-          
           echo "IPA created successfully."
 
       - name: Upload IPA Artifact
